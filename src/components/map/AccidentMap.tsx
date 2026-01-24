@@ -1,10 +1,7 @@
-import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AccidentReport, SeverityLevel } from '@/types/accident';
-import { SeverityBadge } from '@/components/ui/severity-badge';
-import { StatusBadge } from '@/components/ui/status-badge';
 import { format } from 'date-fns';
 
 interface AccidentMapProps {
@@ -19,6 +16,13 @@ const severityColors: Record<SeverityLevel, string> = {
   moderate: '#f59e0b',
   severe: '#f97316',
   fatal: '#b91c1c',
+};
+
+const severityLabels: Record<SeverityLevel, string> = {
+  minor: 'Minor',
+  moderate: 'Moderate',
+  severe: 'Severe',
+  fatal: 'Fatal',
 };
 
 function createCustomIcon(severity: SeverityLevel) {
@@ -51,14 +55,37 @@ function createCustomIcon(severity: SeverityLevel) {
   });
 }
 
-function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
-  const map = useMap();
+function createPopupContent(accident: AccidentReport): string {
+  const color = severityColors[accident.severity];
+  const label = severityLabels[accident.severity];
+  const dateStr = format(accident.dateTime, 'MMM d, yyyy h:mm a');
   
-  useEffect(() => {
-    map.setView(center, zoom);
-  }, [map, center, zoom]);
-
-  return null;
+  return `
+    <div style="min-width: 200px; padding: 4px;">
+      <div style="
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 600;
+        color: white;
+        background-color: ${color};
+        margin-bottom: 8px;
+      ">
+        ${label}
+      </div>
+      <p style="font-weight: 500; font-size: 14px; text-transform: capitalize; margin: 0 0 4px 0;">
+        ${accident.type.replace('-', ' ')} Accident
+      </p>
+      <p style="font-size: 13px; color: #666; margin: 0 0 8px 0;">
+        ${accident.description}
+      </p>
+      <div style="font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 8px;">
+        <p style="margin: 0;">${dateStr}</p>
+        ${accident.address ? `<p style="margin: 4px 0 0 0;">${accident.address}</p>` : ''}
+      </div>
+    </div>
+  `;
 }
 
 export function AccidentMap({
@@ -67,47 +94,61 @@ export function AccidentMap({
   zoom = 11,
   className,
 }: AccidentMapProps) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
+
+  // Initialize map
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+    mapInstanceRef.current = L.map(mapRef.current).setView(center, zoom);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(mapInstanceRef.current);
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  // Update markers when accidents change
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    // Add new markers
+    accidents.forEach(accident => {
+      const marker = L.marker([accident.latitude, accident.longitude], {
+        icon: createCustomIcon(accident.severity),
+      })
+        .addTo(mapInstanceRef.current!)
+        .bindPopup(createPopupContent(accident));
+
+      markersRef.current.push(marker);
+    });
+  }, [accidents]);
+
+  // Update center/zoom when props change
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setView(center, zoom);
+    }
+  }, [center, zoom]);
+
   return (
-    <div className={`map-container ${className}`}>
-      <MapContainer
-        center={center}
-        zoom={zoom}
+    <div className={`map-container ${className || ''}`}>
+      <div
+        ref={mapRef}
         style={{ height: '100%', width: '100%', minHeight: '400px' }}
-        scrollWheelZoom={true}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <MapController center={center} zoom={zoom} />
-        
-        {accidents.map((accident) => (
-          <Marker
-            key={accident.id}
-            position={[accident.latitude, accident.longitude]}
-            icon={createCustomIcon(accident.severity)}
-          >
-            <Popup>
-              <div className="min-w-[200px] space-y-2 p-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <SeverityBadge severity={accident.severity} />
-                  <StatusBadge status={accident.status} />
-                </div>
-                <p className="font-medium text-sm capitalize">
-                  {accident.type.replace('-', ' ')} Accident
-                </p>
-                <p className="text-sm text-muted-foreground line-clamp-3">
-                  {accident.description}
-                </p>
-                <div className="text-xs text-muted-foreground border-t pt-2">
-                  <p>{format(accident.dateTime, 'MMM d, yyyy h:mm a')}</p>
-                  {accident.address && <p>{accident.address}</p>}
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+      />
     </div>
   );
 }
