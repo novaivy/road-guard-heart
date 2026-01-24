@@ -2,95 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Road Accident Reporting System - Design System
+   Professional, authority-inspired palette for emergency/safety applications
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core backgrounds */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
 
+    /* Card surfaces */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 15%;
 
+    /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
+    /* Primary - Deep Navy Blue (Authority/Trust) */
+    --primary: 215 50% 23%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Slate Gray */
+    --secondary: 215 15% 91%;
+    --secondary-foreground: 215 25% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted */
+    --muted: 215 15% 94%;
+    --muted-foreground: 215 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Amber (Warning/Attention) */
+    --accent: 38 92% 50%;
+    --accent-foreground: 215 25% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive - Emergency Red */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Severity Colors */
+    --severity-minor: 142 71% 45%;
+    --severity-moderate: 38 92% 50%;
+    --severity-severe: 25 95% 53%;
+    --severity-fatal: 0 72% 40%;
 
-    --radius: 0.5rem;
+    /* Status Colors */
+    --status-pending: 38 92% 50%;
+    --status-verified: 142 71% 45%;
+    --status-resolved: 215 50% 60%;
 
-    --sidebar-background: 0 0% 98%;
+    /* Borders & Inputs */
+    --border: 215 20% 88%;
+    --input: 215 20% 88%;
+    --ring: 215 50% 40%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --radius: 0.625rem;
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Map marker shadows */
+    --marker-shadow: 0 3px 14px rgba(0, 0, 0, 0.25);
 
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar */
+    --sidebar-background: 215 50% 18%;
+    --sidebar-foreground: 210 40% 95%;
+    --sidebar-primary: 38 92% 50%;
+    --sidebar-primary-foreground: 215 25% 15%;
+    --sidebar-accent: 215 45% 25%;
+    --sidebar-accent-foreground: 210 40% 95%;
+    --sidebar-border: 215 40% 25%;
+    --sidebar-ring: 38 92% 50%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 215 30% 9%;
+    --foreground: 210 40% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 215 30% 12%;
+    --card-foreground: 210 40% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 215 30% 12%;
+    --popover-foreground: 210 40% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 210 40% 95%;
+    --primary-foreground: 215 50% 18%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 215 25% 20%;
+    --secondary-foreground: 210 40% 95%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 215 25% 18%;
+    --muted-foreground: 215 15% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 215 25% 10%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 215 25% 22%;
+    --input: 215 25% 22%;
+    --ring: 38 92% 50%;
+
+    --sidebar-background: 215 35% 8%;
+    --sidebar-foreground: 210 40% 95%;
+    --sidebar-primary: 38 92% 50%;
+    --sidebar-primary-foreground: 215 25% 10%;
+    --sidebar-accent: 215 30% 15%;
+    --sidebar-accent-foreground: 210 40% 95%;
+    --sidebar-border: 215 25% 18%;
+    --sidebar-ring: 38 92% 50%;
   }
 }
 
@@ -100,6 +118,74 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+}
+
+@layer components {
+  .severity-badge-minor {
+    @apply bg-[hsl(var(--severity-minor))] text-white;
+  }
+  
+  .severity-badge-moderate {
+    @apply bg-[hsl(var(--severity-moderate))] text-white;
+  }
+  
+  .severity-badge-severe {
+    @apply bg-[hsl(var(--severity-severe))] text-white;
+  }
+  
+  .severity-badge-fatal {
+    @apply bg-[hsl(var(--severity-fatal))] text-white;
+  }
+
+  .stat-card {
+    @apply bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow;
+  }
+
+  .map-container {
+    @apply rounded-xl overflow-hidden border border-border shadow-lg;
+  }
+}
+
+/* Leaflet Map Customizations */
+.leaflet-container {
+  font-family: inherit;
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0.625rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+  margin: 1rem;
+  font-size: 0.875rem;
+}
+
+.custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: var(--marker-shadow);
+}
+
+.marker-minor {
+  background-color: hsl(142 71% 45%);
+}
+
+.marker-moderate {
+  background-color: hsl(38 92% 50%);
+}
+
+.marker-severe {
+  background-color: hsl(25 95% 53%);
+}
+
+.marker-fatal {
+  background-color: hsl(0 72% 40%);
 }
