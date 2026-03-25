@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      accidents: {
+        Row: {
+          address: string | null
+          created_at: string
+          date_time: string
+          description: string
+          dispatch_notes: string | null
+          dispatched_at: string | null
+          id: string
+          latitude: number
+          longitude: number
+          reporter_contact: string | null
+          reporter_name: string | null
+          severity: Database["public"]["Enums"]["accident_severity"]
+          status: Database["public"]["Enums"]["report_status"]
+          type: Database["public"]["Enums"]["accident_type"]
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          date_time: string
+          description: string
+          dispatch_notes?: string | null
+          dispatched_at?: string | null
+          id?: string
+          latitude: number
+          longitude: number
+          reporter_contact?: string | null
+          reporter_name?: string | null
+          severity: Database["public"]["Enums"]["accident_severity"]
+          status?: Database["public"]["Enums"]["report_status"]
+          type: Database["public"]["Enums"]["accident_type"]
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          date_time?: string
+          description?: string
+          dispatch_notes?: string | null
+          dispatched_at?: string | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          reporter_contact?: string | null
+          reporter_name?: string | null
+          severity?: Database["public"]["Enums"]["accident_severity"]
+          status?: Database["public"]["Enums"]["report_status"]
+          type?: Database["public"]["Enums"]["accident_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +76,17 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      accident_severity: "minor" | "moderate" | "severe" | "fatal"
+      accident_type:
+        | "collision"
+        | "rollover"
+        | "pedestrian"
+        | "cyclist"
+        | "hit-and-run"
+        | "multi-vehicle"
+        | "single-vehicle"
+        | "other"
+      report_status: "pending" | "verified" | "dispatched" | "resolved"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +213,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      accident_severity: ["minor", "moderate", "severe", "fatal"],
+      accident_type: [
+        "collision",
+        "rollover",
+        "pedestrian",
+        "cyclist",
+        "hit-and-run",
+        "multi-vehicle",
+        "single-vehicle",
+        "other",
+      ],
+      report_status: ["pending", "verified", "dispatched", "resolved"],
+    },
   },
 } as const
