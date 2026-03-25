@@ -11,11 +11,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { AccidentType, SeverityLevel } from '@/types/accident';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useCreateAccident } from '@/hooks/useAccidents';
 
-const accidentTypes: { value: AccidentType; label: string }[] = [
+const accidentTypes = [
   { value: 'collision', label: 'Vehicle Collision' },
   { value: 'rollover', label: 'Rollover' },
   { value: 'pedestrian', label: 'Pedestrian Involved' },
@@ -24,14 +24,14 @@ const accidentTypes: { value: AccidentType; label: string }[] = [
   { value: 'multi-vehicle', label: 'Multi-Vehicle' },
   { value: 'single-vehicle', label: 'Single Vehicle' },
   { value: 'other', label: 'Other' },
-];
+] as const;
 
-const severityLevels: { value: SeverityLevel; label: string }[] = [
+const severityLevels = [
   { value: 'minor', label: 'Minor - No or minor injuries' },
   { value: 'moderate', label: 'Moderate - Injuries requiring attention' },
   { value: 'severe', label: 'Severe - Serious injuries' },
   { value: 'fatal', label: 'Fatal - One or more fatalities' },
-];
+] as const;
 
 const formSchema = z.object({
   type: z.enum(['collision', 'rollover', 'pedestrian', 'cyclist', 'hit-and-run', 'multi-vehicle', 'single-vehicle', 'other']),
@@ -51,6 +51,7 @@ export function AccidentReportForm() {
   const { toast } = useToast();
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const createAccident = useCreateAccident();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -110,13 +111,41 @@ export function AccidentReportForm() {
     getLocation();
   }, []);
 
-  const onSubmit = (data: FormData) => {
-    console.log('Form submitted:', data);
-    toast({
-      title: 'Report submitted successfully',
-      description: 'Your accident report has been submitted and will be reviewed shortly.',
-    });
-    form.reset();
+  const onSubmit = async (data: FormData) => {
+    try {
+      await createAccident.mutateAsync({
+        type: data.type,
+        severity: data.severity,
+        description: data.description,
+        date_time: new Date(data.dateTime).toISOString(),
+        latitude: data.latitude,
+        longitude: data.longitude,
+        address: data.address || null,
+        reporter_name: data.reporterName || null,
+        reporter_contact: data.reporterContact || null,
+      });
+      toast({
+        title: 'Report submitted successfully',
+        description: 'Your accident report has been submitted and will be reviewed by county authorities.',
+      });
+      form.reset({
+        type: 'collision',
+        severity: 'minor',
+        description: '',
+        dateTime: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+        latitude: form.getValues('latitude'),
+        longitude: form.getValues('longitude'),
+        address: '',
+        reporterName: '',
+        reporterContact: '',
+      });
+    } catch (error) {
+      toast({
+        title: 'Submission failed',
+        description: 'There was an error submitting your report. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const latitude = form.watch('latitude');
@@ -141,18 +170,8 @@ export function AccidentReportForm() {
             <div className="rounded-lg border bg-muted/30 p-4 space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium">Location</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={getLocation}
-                  disabled={isLocating}
-                >
-                  {isLocating ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <MapPin className="h-4 w-4 mr-2" />
-                  )}
+                <Button type="button" variant="outline" size="sm" onClick={getLocation} disabled={isLocating}>
+                  {isLocating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <MapPin className="h-4 w-4 mr-2" />}
                   {isLocating ? 'Getting location...' : 'Get Current Location'}
                 </Button>
               </div>
@@ -201,9 +220,7 @@ export function AccidentReportForm() {
                       </FormControl>
                       <SelectContent>
                         {accidentTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
+                          <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -226,9 +243,7 @@ export function AccidentReportForm() {
                       </FormControl>
                       <SelectContent>
                         {severityLevels.map((level) => (
-                          <SelectItem key={level.value} value={level.value}>
-                            {level.label}
-                          </SelectItem>
+                          <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -270,7 +285,7 @@ export function AccidentReportForm() {
               )}
             />
 
-            {/* Reporter Info (Optional) */}
+            {/* Reporter Info */}
             <div className="rounded-lg border bg-muted/30 p-4 space-y-4">
               <Label className="text-sm font-medium">Reporter Information (Optional)</Label>
               <div className="grid gap-4 md:grid-cols-2">
@@ -287,7 +302,6 @@ export function AccidentReportForm() {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="reporterContact"
@@ -304,9 +318,13 @@ export function AccidentReportForm() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={!hasLocation}>
-              <Send className="h-4 w-4 mr-2" />
-              Submit Report
+            <Button type="submit" className="w-full" disabled={!hasLocation || createAccident.isPending}>
+              {createAccident.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Send className="h-4 w-4 mr-2" />
+              )}
+              {createAccident.isPending ? 'Submitting...' : 'Submit Report'}
             </Button>
           </form>
         </Form>

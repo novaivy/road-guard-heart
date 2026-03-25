@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { AlertTriangle, Map, BarChart3, FileText, Menu, X } from 'lucide-react';
+import { AlertTriangle, Map, BarChart3, FileText, Menu, X, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -8,6 +8,7 @@ const navItems = [
   { path: '/', label: 'Dashboard', icon: BarChart3 },
   { path: '/map', label: 'Accident Map', icon: Map },
   { path: '/report', label: 'Report Accident', icon: FileText },
+  { path: '/admin', label: 'Admin', icon: Shield },
 ];
 
 export function Header() {
