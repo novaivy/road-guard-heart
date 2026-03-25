@@ -1,27 +1,41 @@
 import { Layout } from '@/components/layout/Layout';
 import { AccidentMap } from '@/components/map/AccidentMap';
 import { MapLegend } from '@/components/map/MapLegend';
-import { mockAccidents } from '@/data/mockAccidents';
+import { useAccidents } from '@/hooks/useAccidents';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
-import { SeverityLevel, ReportStatus } from '@/types/accident';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const MapPage = () => {
-  const [severityFilter, setSeverityFilter] = useState<SeverityLevel | 'all'>('all');
-  const [statusFilter, setStatusFilter] = useState<ReportStatus | 'all'>('all');
+  const { data: accidents, isLoading } = useAccidents();
+  const [severityFilter, setSeverityFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
 
-  const filteredAccidents = mockAccidents.filter((accident) => {
-    if (severityFilter !== 'all' && accident.severity !== severityFilter) return false;
-    if (statusFilter !== 'all' && accident.status !== statusFilter) return false;
-    return true;
-  });
+  const mapAccidents = (accidents ?? [])
+    .filter((a) => {
+      if (severityFilter !== 'all' && a.severity !== severityFilter) return false;
+      if (statusFilter !== 'all' && a.status !== statusFilter) return false;
+      return true;
+    })
+    .map((a) => ({
+      id: a.id,
+      type: a.type as any,
+      severity: a.severity as any,
+      description: a.description,
+      dateTime: new Date(a.date_time),
+      latitude: a.latitude,
+      longitude: a.longitude,
+      address: a.address ?? undefined,
+      status: a.status as any,
+      createdAt: new Date(a.created_at),
+      updatedAt: new Date(a.updated_at),
+    }));
 
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Accident Map</h1>
           <p className="text-muted-foreground">
@@ -30,9 +44,7 @@ const MapPage = () => {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-4">
-          {/* Sidebar */}
           <div className="space-y-6 lg:col-span-1">
-            {/* Filters */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Filters</CardTitle>
@@ -40,10 +52,8 @@ const MapPage = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Severity</Label>
-                  <Select value={severityFilter} onValueChange={(v) => setSeverityFilter(v as SeverityLevel | 'all')}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All severities" />
-                    </SelectTrigger>
+                  <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                    <SelectTrigger><SelectValue placeholder="All severities" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Severities</SelectItem>
                       <SelectItem value="minor">Minor</SelectItem>
@@ -53,45 +63,38 @@ const MapPage = () => {
                     </SelectContent>
                   </Select>
                 </div>
-
                 <div className="space-y-2">
                   <Label>Status</Label>
-                  <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as ReportStatus | 'all')}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All statuses" />
-                    </SelectTrigger>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger><SelectValue placeholder="All statuses" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Statuses</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="verified">Verified</SelectItem>
+                      <SelectItem value="dispatched">Dispatched</SelectItem>
                       <SelectItem value="resolved">Resolved</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-
                 <p className="text-sm text-muted-foreground">
-                  Showing {filteredAccidents.length} of {mockAccidents.length} accidents
+                  Showing {mapAccidents.length} of {accidents?.length ?? 0} accidents
                 </p>
               </CardContent>
             </Card>
-
-            {/* Legend */}
             <MapLegend />
           </div>
 
-          {/* Map */}
           <Card className="lg:col-span-3 animate-fade-in">
             <CardHeader className="pb-2">
               <CardTitle>Reported Accidents</CardTitle>
-              <CardDescription>
-                Hover over markers to see accident details
-              </CardDescription>
+              <CardDescription>Hover over markers to see accident details</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
-              <AccidentMap
-                accidents={filteredAccidents}
-                className="h-[600px] rounded-b-xl"
-              />
+              {isLoading ? (
+                <Skeleton className="h-[600px] w-full rounded-b-xl" />
+              ) : (
+                <AccidentMap accidents={mapAccidents} className="h-[600px] rounded-b-xl" />
+              )}
             </CardContent>
           </Card>
         </div>
