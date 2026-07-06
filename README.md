@@ -1,58 +1,128 @@
-# Welcome to your Road-Guard-Heart project
+# Road Guard Heart
 
-## Project info
+Road Guard Heart is a road-safety support platform designed to help users access important safety information and resources in one place. The application provides a modern, responsive interface focused on promoting safer travel, awareness, and responsible road use.
 
-## How can I edit this code?
+## Live Demo
 
-There are several ways of editing your application.
+[View the live application](https://road-guard-heart.vercel.app/)
 
-**Use your preferred IDE**
+## Features
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected.
+* Responsive and user-friendly interface
+* Road-safety awareness content
+* Easy navigation between application sections
+* Modern reusable UI components
+* Cloud-backed data and authentication support through Supabase
+* Mobile-friendly design for access on different devices
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Tech Stack
 
-Follow these steps:
+* **React** — Frontend user interface
+* **TypeScript** — Type-safe application development
+* **Vite** — Fast development server and build tool
+* **Tailwind CSS** — Utility-first styling
+* **shadcn/ui** — Reusable UI components
+* **Supabase** — Backend services, database, and authentication support
+* **Vitest** — Testing configuration
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Project Structure
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```text
+road-guard-heart/
+│
+├── public/                 # Static assets
+├── src/                    # Application source code
+│   ├── components/         # Reusable UI components
+│   ├── pages/              # Application pages
+│   ├── integrations/       # External service integrations
+│   ├── App.tsx             # Main application component
+│   └── main.tsx            # Application entry point
+│
+├── supabase/               # Supabase configuration and migrations
+├── package.json            # Project dependencies and scripts
+├── vite.config.ts          # Vite configuration
+├── tailwind.config.ts      # Tailwind CSS configuration
+└── README.md
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Getting Started
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Prerequisites
+
+Install the following before running the project:
+
+* Node.js
+* npm
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/novaivy/road-guard-heart.git
+cd road-guard-heart
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Create a `.env` file in the project root and add your Supabase credentials:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+4. Start the development server:
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available on the local address shown in your terminal, usually:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```text
+http://localhost:5173
+```
 
-**Use GitHub Codespaces**
+## Available Scripts
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+npm run dev       # Starts the development server
+npm run build     # Builds the app for production
+npm run preview   # Previews the production build locally
+npm run test      # Runs tests, if configured
+```
 
-## What technologies are used for this project?
+## Deployment
 
-This project is built with:
+This project can be deployed using Vercel.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Push the project to GitHub.
+2. Sign in to Vercel.
+3. Create a new project and import this repository.
+4. Add the required Supabase environment variables.
+5. Deploy the application.
 
-## How can I deploy this project?
+## Future Improvements
 
-Simply open vercel app, create new project, paste the URL from github then deploy
+* Add emergency contact and reporting features
+* Add real-time road incident alerts
+* Add location-based safety guidance
+* Add user accounts and personalized dashboards
+* Add a map for identifying accident-prone areas
+* Add educational road-safety articles and campaigns
 
+## Author
+
+**Nova Ivy**
+
+* GitHub: https://github.com/novaivy
+* Repository: https://github.com/novaivy/road-guard-heart
+
+## License
+
+This project is available for learning, portfolio, and development purposes.
